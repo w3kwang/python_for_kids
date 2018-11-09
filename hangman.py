@@ -158,7 +158,7 @@ def draw_hangman(step):
 
 def pickSecretWord():
 	global secretWord
-	wordList = "iphone python china".split()
+	wordList = "election democrat republic senate congress midterm".split()
 	secretWord = choice(wordList)
 
 def getGuess():
@@ -178,9 +178,22 @@ def makeWordString():
 	# convert list into string
 	displayWord = '  '.join(displayWord)
 
+def checkWordGuess():
+	global secretWord, gameDone, displayWord
+
+	displayText("Please guess the word")
+	theGuessWord = getGuess()
+	if theGuessWord.lower() == secretWord.lower():
+		displayText("You Rock! \nThe secret word is: " + secretWord)
+		gameDone = True
+	else:
+		displayText("Sorry, guess again")
+		time.sleep(2)
+		displayText(displayWord)
+
 def playGame():
-	global gameDone, secretWord, lettersCorrect, lettersWrong
-	global failMax, fails
+	global gameDone, fails, alpha, secretWord, lettersCorrect, lettersWrong
+	global failMax
 
 	while gameDone == False and fails > 0:
 		# get input
@@ -188,10 +201,18 @@ def playGame():
 		if theGuess is None:
 			# press Cancel button to exit game
 			break
-		else:
-			theGuess = theGuess.lower()
-
-		if theGuess in secretWord:
+		elif theGuess == "$$":
+			print("Let them guess word")
+			checkWordGuess() ###NEW
+		elif len(theGuess) > 1 or theGuess == "":
+			displayText("Sorry I need a letter, guess again")
+			time.sleep(1)
+			displayText(displayWord)
+		elif theGuess not in alpha:
+			displayText(theGuess + " is not a letter, guess again.")
+			time.sleep(1)
+			displayText(displayWord)
+		elif theGuess.lower() in secretWord.lower():
 			lettersCorrect += theGuess
 			makeWordString()
 			displayText(displayWord)
@@ -201,11 +222,12 @@ def playGame():
 				gameDone = True
 				break
 		else:
-			if theGuess not in lettersWrong:
-				lettersWrong += theGuess
-			displayBadLetters("Not in word: [" + lettersWrong + "]")
+			lettersWrong += theGuess.lower() + ", "
 			fails -= 1
+			displayText(theGuess + " is not in the word")
 			draw_hangman(failMax - fails)
+			displayText(displayWord)
+			displayBadLetters("Not in word: [" + lettersWrong + "]")
 
 		#you can also add this to get out of loop
 		#gameDone = True
