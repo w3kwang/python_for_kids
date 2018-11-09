@@ -2,7 +2,7 @@ from turtle import *
 from random import randint, choice
 import time
 
-sw = 600
+sw = 720
 sh = 850
 s = getscreen()
 s.setup(sw, sh)
@@ -21,7 +21,7 @@ tBadLetters = Turtle()
 tBadLetters.hideturtle()
 
 #variables to play the game -- Global
-fontS = int(sh*0.05)
+fontS = int(sh*0.04)
 
 def displayText(newText):
 	tWriter.clear()
@@ -213,26 +213,66 @@ def playGame():
 			time.sleep(1)
 			displayText(displayWord)
 		elif theGuess.lower() in secretWord.lower():
-			lettersCorrect += theGuess
+			lettersCorrect += theGuess.lower()
 			makeWordString()
 			displayText(displayWord)
-			ur_answer = ''.join(displayWord.split())
-			if ur_answer == secretWord:
-				displayText(displayWord + "\nYou Won!")
-				gameDone = True
-				break
+			# ur_answer = ''.join(displayWord.split())
+			# if ur_answer == secretWord:
+			# 	displayText(displayWord + "\nYou Won!")
+			# 	gameDone = True
+			# 	break
 		else:
-			lettersWrong += theGuess.lower() + ", "
-			fails -= 1
-			displayText(theGuess + " is not in the word")
-			draw_hangman(failMax - fails)
-			displayText(displayWord)
-			displayBadLetters("Not in word: [" + lettersWrong + "]")
+			if theGuess.lower() not in lettersWrong:
+				lettersWrong += theGuess.lower() + ", "
+				fails -= 1
+				displayText(theGuess + " is not in the word")
+				time.sleep(1)
+				draw_hangman(failMax - fails)
+				displayText(displayWord)
+				displayBadLetters("Not in word: [" + lettersWrong + "]")
+			else:
+				displayText(theGuess + " was already guessed. Try again")
+				time.sleep(1)
+				displayText(displayWord)
 
-		#you can also add this to get out of loop
-		#gameDone = True
-	displayBadLetters("Game Over!")
-	time.sleep(5)
+		if "_" not in displayWord:
+			displayText("YES!!! You Won-Word is:" + secretWord)
+			gameDone = True
+
+		if fails <= 0:
+			displayText("Sorry Out of Guess-Word is " + secretWord)
+			gameDone = True
+
+		if gameDone == True:
+			restartGame()
+
+	
+
+def restartGame():
+	global fails, failMax, lettersCorrect, lettersWrong, gameDone
+	boxTitle = "Want to play again"
+	guess = s.textinput(boxTitle, 'Input "yes" to play again')
+
+	if guess.lower() == 'y' or guess.lower() == 'yes':
+		lettersCorrect = ""
+		lettersWrong = ""
+		t1.clear()
+		t1.penup()
+		t1.home()
+		t1.pendown()
+		drawGallows()
+		pickSecretWord()
+		displayText("Guess a Letter..")
+		displayBadLetters("Not in word: [" + lettersWrong + "]")
+		time.sleep(1)
+		makeWordString()
+		displayText(displayWord)
+		fails = 6
+		gameDone = False
+	else:
+		displayBadLetters("Ok, see you later")
+		time.sleep(5)
+
 
 #actual game setup
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
